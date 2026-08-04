@@ -243,6 +243,16 @@ export async function configureAutoUpdater() {
     try {
         console.log("Configuring updater");
         const settings = (await RpcApi.GetFullConfigCommand(ElectronWshClient)).settings;
+
+        // The Tempus fork disables auto-update by default and ships no app-update.yml, so constructing
+        // the Updater would throw on the missing file. Bail out here rather than letting the generic
+        // catch below be the only thing standing between a disabled updater and an unhandled error.
+        if (!settings["autoupdate:enabled"]) {
+            console.log("auto-update is disabled in settings, skipping updater configuration");
+            autoUpdateLock = false;
+            return;
+        }
+
         updater = new Updater(settings);
         await updater.start();
     } catch (e) {

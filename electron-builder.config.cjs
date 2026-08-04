@@ -117,10 +117,10 @@ const config = {
         // this should remove /usr/lib/.build-id/ links which can conflict with other electron apps like slack
         fpm: ["--rpm-rpmbuild-define", "_build_id_links none"],
     },
-    publish: {
-        provider: "generic",
-        url: "https://dl.waveterm.dev/releases-w2",
-    },
+    // An update resolved from the upstream feed would install the official build over this fork
+    // and silently drop every fork-only change. Disabled outright rather than repointed, because
+    // this fork publishes no feed of its own.
+    publish: null,
     afterPack: (context) => {
         // This is a workaround to restore file permissions to the wavesrv binaries on macOS after packaging the universal binary.
         if (context.electronPlatformName === "darwin" && context.arch === Arch.universal) {
