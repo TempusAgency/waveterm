@@ -119,18 +119,24 @@ const BlockFull = memo(({ nodeModel, viewModel }: FullBlockProps) => {
             return;
         }
         setBlockClicked(false);
-        const focusWithin = focusedBlockId() == nodeModel.blockId;
-        if (!focusWithin) {
-            setFocusTarget();
-        }
+        // blockClicked lags one render behind isFocused, so this effect also runs for a block that
+        // has just *lost* focus; without this guard that block pulls the focus straight back. Two
+        // webview blocks then trade focus forever (upstream issue #3428), because <webview>
+        // focus/blur cross a process boundary and do not settle inside a single React commit the
+        // way the terminal's synchronous events do.
         if (!isFocused) {
-            nodeModel.focusNode();
+            return;
         }
+        if (focusedBlockId() == nodeModel.blockId) {
+            return;
+        }
+        setFocusTarget();
     }, [blockClicked, isFocused]);
 
     const setBlockClickedTrue = useCallback(() => {
         setBlockClicked(true);
-    }, []);
+        nodeModel.focusNode();
+    }, [nodeModel]);
 
     const [blockContentOffset, setBlockContentOffset] = useState<Dimensions>();
 
