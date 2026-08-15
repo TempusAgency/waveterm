@@ -48,13 +48,18 @@ that proves nothing drifted — is in the governing document.
 
 ## Running the fork
 
-Launch the fork with `WAVETERM_DATA_HOME` and `WAVETERM_CONFIG_HOME` pointed somewhere other than the official Wave
-directories.
+The fork ships as its own application, `Wave Tempus OS`, and no longer needs `WAVETERM_DATA_HOME` /
+`WAVETERM_CONFIG_HOME` to stay clear of the official build. The directory names are forked at the source: the Electron
+side calls `envPaths("wave-tempus-os", ...)`, `app.setName("wave-tempus-os/electron")` moves Electron's own session and
+cache, and the Go side uses `appBundle := "wave-tempus-os"`. `appId` alone would not have moved any of them.
 
-Both builds otherwise resolve the same paths: the Electron side calls `envPaths("waveterm", ...)` and the Go side
-hardcodes `appBundle := "waveterm"`, and neither is affected by a changed `appId`. Sharing those directories means
-sharing one `settings.json` and one database — and database migrations run when the app opens, so the official build
-and the fork can migrate the same file out from under each other.
+Data and config therefore live at `~/Library/Application Support/wave-tempus-os` (macOS) or `~/.config/wave-tempus-os`
+(Linux), with caches under the matching `wave-tempus-os` bundle name. Sharing those directories was never survivable:
+one `settings.json`, one database, and database migrations that run when the app opens, so the official build and the
+fork could migrate the same file out from under each other.
+
+The fork starts empty as a result. It does not read, import or migrate the official Wave's workspaces, tabs, blocks,
+connections or settings — that separation is the point, not a regression.
 
 ## Governing document
 
