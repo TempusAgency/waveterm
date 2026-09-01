@@ -402,6 +402,7 @@ func (bc *ShellController) setupAndStartShellProcess(logCtx context.Context, rc 
 	if bc.ControllerType == BlockController_Shell {
 		cmdOpts.Interactive = true
 		cmdOpts.Login = true
+		cmdOpts.ForceJwt = blockMeta.GetBool(waveobj.MetaKey_CmdJwt, false)
 		cmdOpts.Cwd = blockMeta.GetString(waveobj.MetaKey_CmdCwd, "")
 		if cmdOpts.Cwd != "" {
 			cwdPath, err := wavebase.ExpandHomeDir(cmdOpts.Cwd)
